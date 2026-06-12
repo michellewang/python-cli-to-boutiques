@@ -38,6 +38,7 @@ runs:
 
         # create argdump from argparse
         python ./scripts/main.py $LOCATION $PARSER --output argdump.json
+        cat argdump.json
 
         # create boutiques descriptor from argdump
         npx -y --package @styx-api/cli styx build argdump.json --out styx-out --backend boutiques

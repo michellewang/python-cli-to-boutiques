@@ -19,11 +19,6 @@ runs:
   using: composite
   steps:
 
-    - name: Check out the repository
-      uses: actions/checkout@v6
-      with:
-        repository: ${{ inputs.repository }}
-
     - name: Set up Node.js
       uses: actions/setup-node@v6
 
@@ -41,7 +36,6 @@ runs:
       run: |
         pip install -U pip
         pip install argdump
-        pip install .
       shell: bash
 
     - name: Create argdump file

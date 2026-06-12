@@ -42,6 +42,7 @@ runs:
         # move descriptor to output path
         mkdir -p $(dirname $OUTPUT_PATH)
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
+        cat $OUTPUT_PATH
       env:
         LOCATION: ${{ inputs.location }}
         PARSER: ${{ inputs.parser }}

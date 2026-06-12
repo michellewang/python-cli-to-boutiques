@@ -57,6 +57,7 @@ runs:
 
     - name: Move descriptor
       run: |
+        mkdir -p $(dirname $OUTPUT_PATH)
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
       shell: bash
       env:

@@ -30,6 +30,7 @@ runs:
     - name: Install styx
       run: |
         npm install @styx-api/core
+      shell: bash
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -41,18 +42,22 @@ runs:
         pip install -U pip
         pip install argdump
         pip install .
+      shell: bash
 
     - name: Create argdump file
       run: ./scripts/argdumprun.py $PARSER_LOCATION --output argdump.json
       env:
         PARSER_LOCATION: ${{ inputs.parser-location }}
+      shell: bash
 
     - name: Create the Boutiques descriptor
       run: |
         npx -y --package @styx-api/cli styx build argdump.json --out styx-out --backend boutiques
+      shell: bash
 
     - name: Move descriptor
       run: |
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
+      shell: bash
       env:
         OUTPUT_PATH: ${{ inputs.output-path }}

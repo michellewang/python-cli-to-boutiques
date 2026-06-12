@@ -15,12 +15,17 @@ def load_parser(module_path: str, parser_func_name: str) -> argparse.ArgumentPar
     module = importlib.import_module(module_path)
 
     try:
-        parser = getattr(module, parser_func_name)
+        parser_func = getattr(module, parser_func_name)
     except AttributeError as exception:
         raise AttributeError(
             f"{module_path!r} has no attribute {parser_func_name!r}"
         ) from exception
 
+    parser = parser_func()
+    if not isinstance(parser, argparse.ArgumentParser):
+        raise TypeError(
+            f"{parser_func_name!r} in {module_path!r} did not return an argparse.ArgumentParser object."
+        )
     return parser
 
 

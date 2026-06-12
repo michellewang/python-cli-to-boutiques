@@ -8,7 +8,7 @@
     "platform_machine": "arm64",
     "argdump_version": "0.1.2"
   },
-  "prog": "argdumprun.py",
+  "prog": "main.py",
   "description": "MRIQC 24.0.0\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\n\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.",
   "formatter_class": "ArgumentDefaultsHelpFormatter",
   "actions": [
@@ -30,7 +30,7 @@
       "dest": "bids_dir",
       "action_type": "store",
       "type_info": {
-        "name": "functools.partial(<function _build_parser.<locals>._path_exists at 0x100c41c10>, parser=ArgumentParser(prog='argdumprun.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
+        "name": "functools.partial(<function _build_parser.<locals>._path_exists at 0x109587f70>, parser=ArgumentParser(prog='main.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
         "serializable": false
       },
       "required": true,
@@ -240,7 +240,7 @@
       "dest": "nprocs",
       "action_type": "store",
       "type_info": {
-        "name": "functools.partial(<function _build_parser.<locals>._min_one at 0x129c9a940>, parser=ArgumentParser(prog='argdumprun.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
+        "name": "functools.partial(<function _build_parser.<locals>._min_one at 0x12d6f79d0>, parser=ArgumentParser(prog='main.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
         "serializable": false
       },
       "help": "Maximum number of simultaneously running parallel processes executed by *MRIQC* (e.g., several instances of ANTs' registration). However, when ``--nprocs`` is greater or equal to the ``--omp-nthreads`` option, it also sets the maximum number of threads that simultaneously running processes may aggregate (meaning, with ``--nprocs 16 --omp-nthreads 8`` a maximum of two 8-CPU-threaded processes will be running at a given time). Under this mode of operation, ``--nprocs`` sets the maximum number of processors that can be assigned work within an *MRIQC* job, which includes all the processors used by currently running single- and multi-threaded processes. If ``None``, the number of CPUs available will be automatically assigned (which may not be what you want in, e.g., shared systems like a HPC cluster."
@@ -253,7 +253,7 @@
       "dest": "omp_nthreads",
       "action_type": "store",
       "type_info": {
-        "name": "functools.partial(<function _build_parser.<locals>._min_one at 0x129c9a940>, parser=ArgumentParser(prog='argdumprun.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
+        "name": "functools.partial(<function _build_parser.<locals>._min_one at 0x12d6f79d0>, parser=ArgumentParser(prog='main.py', usage=None, description=\"MRIQC 24.0.0\\nAutomated Quality Control and visual reports for Quality Assessment of structural (T1w, T2w) and functional MRI of the brain.\\n\\nIMPORTANT: Anonymized quality metrics (IQMs) will be submitted to MRIQC's metrics repository. Submission of IQMs can be disabled using the ``--no-sub`` argument. Please visit https://mriqc.readthedocs.io/en/latest/dsa.html to revise MRIQC's Data Sharing Agreement.\", formatter_class=<class 'argparse.ArgumentDefaultsHelpFormatter'>, conflict_handler='error', add_help=True))",
         "serializable": false
       },
       "help": "Maximum number of threads that multi-threaded processes executed by *MRIQC* (e.g., ANTs' registration) can use. If ``None``, the number of CPUs available will be automatically assigned (which may not be what you want in, e.g., shared systems like a HPC cluster."
@@ -314,7 +314,7 @@
       "dest": "work_dir",
       "action_type": "store",
       "default": {
-        "__repr__": "PosixPath('/Users/melaniegarcia/Documents/postdoc/boutiques_project/argparse-to-boutiques/work')",
+        "__repr__": "PosixPath('/Users/melaniegarcia/Documents/postdoc/boutiques_project/mriqc-master/work')",
         "__type_name__": "PosixPath",
         "__serializable__": false
       },

@@ -33,10 +33,8 @@ def set_at_path(obj: dict | list, path_parts: list[str | int], value) -> None:
     obj[path_parts[-1]] = value
 
 
-def apply_updates(descriptor: dict, updates: dict | None = None) -> dict:
+def apply_updates(descriptor: dict, updates: dict) -> dict:
     """Return *descriptor* with values from *updates* applied."""
-    if updates is None:
-        return descriptor
     for path_str, value in updates.items():
         path_parts = parse_path(path_str)
         set_at_path(descriptor, path_parts, value)
@@ -81,8 +79,12 @@ def main():
 
     with open(args.descriptor) as f:
         descriptor = json.load(f)
-    with open(args.updates) as f:
-        updates = json.load(f)
+
+    if args.updates is not None:
+        with open(args.updates) as f:
+            updates = json.load(f)
+    else:
+        updates = {}
 
     descriptor = apply_updates(descriptor, updates)
 

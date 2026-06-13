@@ -24,6 +24,9 @@ inputs:
     description: Whether to open a pull request with the generated descriptor
     required: false
     default: true
+  update-file:
+    description: 'Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. {"description": "new desc", "inputs[0].name": "new-name"}).'
+    required: false
 
 runs:
   using: composite
@@ -79,6 +82,14 @@ runs:
         mkdir -p $(dirname $OUTPUT_PATH)
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
         cat $OUTPUT_PATH
+
+        # apply user-specified updates
+        if [[ -n "$UPDATE_FILE" ]]; then
+          python ./scripts/update_descriptor.py \
+            --descriptor $OUTPUT_PATH \
+            --updates $UPDATE_FILE
+          cat $OUTPUT_PATH
+        fi
       env:
         PARSER_TYPE: ${{ inputs.parser-type }}
         PARSER_LOCATION: ${{ inputs.parser-location }}
@@ -86,6 +97,7 @@ runs:
         DUMP_FILE: dump.json
         CLICK_PROG_NAME: ${{ inputs.click-prog-name }}
         CLICK_PARENT_LOCATION: ${{ inputs.click-parent-location }}
+        UPDATE_FILE: ${{ github.workspace }}/${{ inputs.update-file }}
       shell: bash
 
     - name: Sanitize branch name

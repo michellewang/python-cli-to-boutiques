@@ -8,17 +8,16 @@ from pathlib import Path
 
 DEFAULT_INDENT = 2
 
-PATH_RE = re.compile(r"(\w+)(?:\[(\d+)\])?")
+PATH_RE = re.compile(r"([\w-]+)(?:\[(\d+)\])?")
 
 
 def parse_path(path_str: str) -> list[str | int]:
     """Parse "inputs[0].name" into ["inputs", 0, "name"]."""
     parts = []
     for key, idx in PATH_RE.findall(path_str):
+        parts.append(key)
         if idx:
             parts.append(int(idx))
-        else:
-            parts.append(key)
     return parts
 
 

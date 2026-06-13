@@ -23,16 +23,14 @@ def parse_path(path_str: str) -> list[str | int]:
 
 def set_at_path(obj: dict | list, path_parts: list[str | int], value) -> None:
     """Navigate *path_parts* through *obj* and set *value* at the leaf."""
-    for i, part in enumerate(path_parts[:-1]):
+    for part in path_parts[:-1]:
         if isinstance(part, int):
             obj = obj[part]
         else:
+            if part not in obj:
+                obj[part] = {}
             obj = obj[part]
-    last = path_parts[-1]
-    if isinstance(last, int):
-        obj[last] = value
-    else:
-        obj[last] = value
+    obj[path_parts[-1]] = value
 
 
 def apply_updates(descriptor: dict, updates: dict) -> dict:

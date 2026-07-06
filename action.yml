@@ -18,18 +18,21 @@ inputs:
   token:
     description: GitHub token with write permissions for "contents" and "pull-requests". Required if open-pr is true.
     required: false
-  exclude-version:
-    description: Whether to exclude the tool-version field in the Boutiques descriptor even if version information is available. This is enabled by default because dynamic versioning schemes can cause the descriptor to be updated on every commit.
-    required: false
-    default: true
   click-prog-name:
     description: Program name to use for the Click parser type. By default this will be the name of the decorated function.
     required: false
   click-parent-location:
     description: Module path to and name of function that produces the click.Group object that contains the click.Command object to serialize. E.g., "my_package.my_module:my_func_name". This is needed for nested commands.
     required: false
+  exclude-version:
+    description: Whether to exclude the tool-version field in the Boutiques descriptor even if version information is available. This is enabled by default because dynamic versioning schemes can cause the descriptor to be updated on every commit.
+    required: false
+    default: true
   updates-file:
-    description: 'Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. {"description": "new desc", "inputs[0].name": "new-name"}).'
+    description: 'Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. {"description": "new desc"}).'
+    required: false
+  updates-str:
+    description: 'JSON string with updates to apply to the generated Boutiques descriptor. The string should contain a map of dot/bracket paths to values (e.g. {"description": "new desc"}). Updates specified this way will override those in the updates file.'
     required: false
 
 runs:
@@ -93,11 +96,14 @@ runs:
 
         # apply user-specified updates
         UPDATES_DESCRIPTOR_ARGS=()
-        if [[ "${{ inputs.exclude-version }}" == "true" ]]; then
-          UPDATES_DESCRIPTOR_ARGS+=(--exclude-version)
+        if [[ "${EXCLUDE_VERSION}" == "true" ]]; then
+          UPDATES_DESCRIPTOR_ARGS+=(--remove-version)
         fi
-        if [[ -n "${{ inputs.updates-file }}" ]]; then
-          UPDATES_DESCRIPTOR_ARGS+=(--updates ${{ github.workspace }}/${{ inputs.updates-file }})
+        if [[ -n "${UPDATES_FILE}" ]]; then
+          UPDATES_DESCRIPTOR_ARGS+=(--updates-file ${{ github.workspace }}/${UPDATES_FILE})
+        fi
+        if [[ -n "${UPDATES_STR}" ]]; then
+          UPDATES_DESCRIPTOR_ARGS+=(--updates-str "${UPDATES_STR}")
         fi
         if [[ "${#UPDATES_DESCRIPTOR_ARGS[@]}" -gt 0 ]]; then
           python ./scripts/update_descriptor.py --descriptor $OUTPUT_PATH "${UPDATES_DESCRIPTOR_ARGS[@]}"
@@ -110,10 +116,14 @@ runs:
         DUMP_FILE: dump.json
         CLICK_PROG_NAME: ${{ inputs.click-prog-name }}
         CLICK_PARENT_LOCATION: ${{ inputs.click-parent-location }}
+        EXCLUDE_VERSION: ${{ inputs.exclude-version }}
+        UPDATES_FILE: ${{ inputs.updates-file }}
+        UPDATES_STR: ${{ inputs.updates-str }}
       shell: bash
 
     - name: Sanitize branch name
       id: sanitize
+      if: ${{ inputs.open-pr == 'true' }}
       run: |
         SANITIZED="${{ inputs.parser-location }}"
         SANITIZED="${SANITIZED//./__}"

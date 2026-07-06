@@ -33,12 +33,12 @@ def set_at_path(obj: dict | list, path_parts: list[str | int], value) -> None:
     obj[path_parts[-1]] = value
 
 
-def apply_updates(descriptor: dict, exclude_version: bool, updates: dict) -> dict:
+def apply_updates(descriptor: dict, updates: dict, remove_version: bool) -> dict:
     """Return *descriptor* with values from *updates* applied."""
     for path_str, value in updates.items():
         path_parts = parse_path(path_str)
         set_at_path(descriptor, path_parts, value)
-    if exclude_version:
+    if remove_version:
         descriptor.pop("tool-version", None)
     return descriptor
 
@@ -53,16 +53,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to the Boutiques descriptor JSON file to update",
     )
     parser.add_argument(
-        "-u",
-        "--updates",
+        "--updates-file",
         required=False,
         type=Path,
         help="Path to a JSON file mapping path expressions to their new values",
     )
     parser.add_argument(
-        "--exclude-version",
+        "--updates-str",
+        required=False,
+        type=str,
+        help="JSON string with a mapping of path expressions to their new values",
+    )
+    parser.add_argument(
+        "--remove-version",
+        required=False,
         action="store_true",
-        help="Exclude the tool-version field in the Boutiques descriptor even if version information is available.",
+        help="Remove the 'tool-version' field from the descriptor",
     )
     parser.add_argument(
         "-o",
@@ -86,13 +92,14 @@ def main():
 
     with open(args.descriptor) as f:
         descriptor = json.load(f)
-    if args.updates is not None:
-        with open(args.updates) as f:
-            updates = json.load(f)
-    else:
-        updates = {}
 
-    descriptor = apply_updates(descriptor, args.exclude_version, updates)
+    updates = {}
+    if args.updates_str is not None:
+        updates.update(json.loads(args.updates_str))
+    if args.updates_file is not None:
+        updates.update(json.loads(args.updates_file.read_text()))
+
+    descriptor = apply_updates(descriptor, updates, args.remove_version)
 
     output_path = args.output or args.descriptor
     output_path.parent.mkdir(parents=True, exist_ok=True)

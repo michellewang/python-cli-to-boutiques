@@ -11,10 +11,11 @@ GitHub Action to create a [Boutiques descriptor](https://boutiques.github.io/) f
 | `output-path` | Where the output Boutiques description file should be written. | yes | — |
 | `open-pr` | Whether to open a pull request with the generated descriptor. A GitHub token must be provided as well. | no | `true` |
 | `token` | GitHub token with write permissions for `contents` and `pull-requests`. Required if `open-pr` is true. | no | — |
-| `exclude-version` | Whether to exclude the `tool-version` field in the Boutiques descriptor even if version information is available. Enabled by default because dynamic versioning schemes can cause the descriptor to be updated on every commit. | no | `true` |
 | `click-prog-name` | Program name to use for the Click parser type. By default this will be the name of the decorated function. | no | — |
 | `click-parent-location` | Module path to and name of function that produces the `click.Group` object that contains the `click.Command` object to serialize. E.g., `"my_package.my_module:my_func_name"`. Needed for nested commands. | no | — |
-| `updates-file` | Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. `{"container-image.image": "my-container-image:tag", "container-image.type": "docker"}`). | no | — |
+| `exclude-version` | Whether to exclude the `tool-version` field in the Boutiques descriptor even if version information is available. Enabled by default because dynamic versioning schemes can cause the descriptor to be updated on every commit. | no | `true` |
+| `updates-file` | Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. `{"description": "new desc"}`). | no | — |
+| `updates-str` | JSON string with updates to apply to the generated Boutiques descriptor. The string should contain a map of dot/bracket paths to values (e.g. `{"description": "new desc"}`). Updates specified this way will override those in the updates file. | no | — |
 
 ## Example workflows
 
@@ -45,15 +46,15 @@ jobs:
           parser-type: argparse
           parser-location: my_tool.cli:get_parser
           output-path: descriptor.json
-          open-pr: true
           token: ${{ secrets.TOKEN }}
-          exclude-version: true
 ```
 
 
-### With a custom updates file
+#### Customizing the descriptor
 
-Custom values can be set to any field using `updates-file`:
+Custom values can be set to any field using `updates-str` (JSON string) or `updates-file` (path to JSON file).
+The update keys should be dot/bracket paths.
+This can be used for example to add a `"container-image"` field:
 
 ```yaml
       - uses: michellewang/python-cli-to-boutiques@v1
@@ -61,20 +62,8 @@ Custom values can be set to any field using `updates-file`:
           parser-type: argparse
           parser-location: my_tool.cli:get_parser
           output-path: descriptor.json
-          open-pr: true
           token: ${{ secrets.TOKEN }}
-          exclude-version: true
-          updates-file: descriptor_updates.json
-```
-
-The updates file is a JSON file mapping dot/bracket paths to custom values.
-It can be useful for example for adding a `"container-image"` field:
-
-```json
-{
-   "container-image.image": "my-container-image:tag",
-   "container-image.type": "docker",
-}
+          updates-str: '{"container-image.image": "my-container-image:tag", "container-image.type": "docker"}'
 ```
 
 > [!NOTE]
@@ -88,8 +77,6 @@ It can be useful for example for adding a `"container-image"` field:
           parser-type: click
           parser-location: my_tool.cli:cli
           output-path: descriptor.json
-          open-pr: true
           token: ${{ secrets.TOKEN }}
-          exclude-version: true
           click-prog-name: my-tool
 ```

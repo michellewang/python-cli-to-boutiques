@@ -1,5 +1,5 @@
 name: CLI to Boutiques
-description: Create a Boutiques descriptor for a Python CLI based on `argparse.ArgumentParser` or `click`
+description: Create a Boutiques descriptor for a Python CLI based on `argparse` or `click`
 inputs:
   parser-type:
     description: Type of parser to serialize. Either "argparse" or "click".
@@ -8,22 +8,22 @@ inputs:
   parser-location:
     description: Module path to and name of function that produces the argparse.ArgumentParser or click.Command objects. E.g., "my_package.my_module:my_func_name"
     required: true
-  token:
-    description: GitHub token with permissions to create pull requests. If using the repository's default GITHUB_TOKEN, ensure that it has write permissions for "contents" and "pull-requests" to create pull requests.
-    required: true
   output-path:
     description: Where the output Boutiques description file should be written
     required: true
+  open-pr:
+    description: Whether to open a pull request with the generated descriptor. If this is set to true (default), a GitHub token must be provided as well.
+    required: false
+    default: true
+  token:
+    description: GitHub token with write permissions for "contents" and "pull-requests". Required if open-pr is true.
+    required: false
   click-prog-name:
-    description: Program name to use for the Click parser types. By default this will be the name of the decorated function.
+    description: Program name to use for the Click parser type. By default this will be the name of the decorated function.
     required: false
   click-parent-location:
     description: Module path to and name of function that produces the click.Group object that contains the click.Command object to serialize. E.g., "my_package.my_module:my_func_name". This is needed for nested commands.
     required: false
-  open-pr:
-    description: Whether to open a pull request with the generated descriptor
-    required: false
-    default: true
   updates-file:
     description: 'Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. {"description": "new desc", "inputs[0].name": "new-name"}).'
     required: false
@@ -36,7 +36,11 @@ runs:
       run: |
         if [[ "${{ inputs.parser-type }}" != "argparse" && "${{ inputs.parser-type }}" != "click" ]]; then
           echo "::error::parser-type must be 'argparse' or 'click', got '${{ inputs.parser-type }}'"
-          exit 1
+          exit 2
+        fi
+        if [[ "${{ inputs.open-pr }}" == "true" && -z "${{ inputs.token }}" ]]; then
+          echo "::error::token must be provided if open-pr is true"
+          exit 2
         fi
       shell: bash
 

@@ -28,6 +28,7 @@ def run_clickdump(
     indent: int = DEFAULT_INDENT,
     prog: Optional[str] = None,
     parent_location: Optional[str] = None,
+    include_hidden: bool = False,
 ):
     """Serialize a click.Command/Group to JSON using clickdump."""
     module_path, command_name = location.split(":")
@@ -38,7 +39,9 @@ def run_clickdump(
         parent_module_path, parent_name = parent_location.split(":")
         parent = load_command(parent_module_path, parent_name)
 
-    serialized = clickdump.dumps(command, parent=parent, prog=prog, indent=indent)
+    serialized = clickdump.dumps(
+        command, parent=parent, prog=prog, indent=indent, include_hidden=include_hidden
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(f"{serialized}\n")
 
@@ -73,6 +76,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help='Module path and attribute of the parent click.Group. E.g., "my_package.my_module:parent_group"',
     )
+    parser.add_argument(
+        "--include-hidden",
+        action="store_true",
+        help="Include hidden options in the dumped descriptor.",
+    )
     return parser
 
 
@@ -85,6 +93,7 @@ def main():
         indent=args.indent,
         prog=args.prog,
         parent_location=args.parent,
+        include_hidden=args.include_hidden,
     )
 
 

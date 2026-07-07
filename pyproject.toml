@@ -8,6 +8,11 @@ dependencies = [
     "argdump>=0.1.2",
 ]
 
+[project.optional-dependencies]
+validation = [
+    "boutiques>=0.5.33",
+]
+
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",

@@ -56,6 +56,10 @@ runs:
 
     - name: Create descriptor
       run: |
+        echo "::group::Setting up"
+        # print commands as they are executed
+        set -x
+
         # change directory avoid interference from the user's codebase
         cd ${{ github.action_path }}
 
@@ -63,6 +67,9 @@ runs:
         npm install @styx-api/core
 
         pip install -U pip
+        echo "::endgroup::"
+
+        echo "::group::Creating the dump file"
         if [[ "$PARSER_TYPE" == "click" ]]; then
           # install clickdump from GitHub
           pip install git+https://github.com/michellewang/clickdump.git
@@ -83,18 +90,19 @@ runs:
           # create dump from argparse
           python ./scripts/run_argdump.py --output $DUMP_FILE $PARSER_LOCATION
         fi
+        echo "::debug::`cat $DUMP_FILE`"
+        echo "::endgroup::"
 
-        cat $DUMP_FILE
-
-        # create boutiques descriptor from dump
+        echo "::group::Creating Boutiques descriptor from dump file"
         npx -y --package @styx-api/cli styx build $DUMP_FILE --out styx-out --backend boutiques
+        echo "::endgroup::"
 
         # move descriptor to output path
         mkdir -p $(dirname $OUTPUT_PATH)
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
-        cat $OUTPUT_PATH
+        echo "::debug::`cat $OUTPUT_PATH`"
 
-        # apply user-specified updates
+        echo "::group::Applying user-specified updates"
         UPDATES_DESCRIPTOR_ARGS=()
         if [[ "${EXCLUDE_VERSION}" == "true" ]]; then
           UPDATES_DESCRIPTOR_ARGS+=(--remove-version)
@@ -107,8 +115,12 @@ runs:
         fi
         if [[ "${#UPDATES_DESCRIPTOR_ARGS[@]}" -gt 0 ]]; then
           python ./scripts/update_descriptor.py --descriptor $OUTPUT_PATH "${UPDATES_DESCRIPTOR_ARGS[@]}"
-          cat $OUTPUT_PATH
         fi
+        echo "::endgroup::"
+
+        echo "::group::Final descriptor"
+        cat $OUTPUT_PATH
+        echo "::endgroup::"
       env:
         PARSER_TYPE: ${{ inputs.parser-type }}
         PARSER_LOCATION: ${{ inputs.parser-location }}

@@ -106,12 +106,15 @@ runs:
         set +x
         echo "::endgroup::"
 
+        echo "::group::Moving descriptor to output path"
         set -x
         # move descriptor to output path
         mkdir -p $(dirname $OUTPUT_PATH)
         mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
-        echo "::debug::`cat $OUTPUT_PATH`"
         set +x
+        echo "::endgroup::"
+
+        echo "::debug::`cat $OUTPUT_PATH`"
 
         echo "::group::Applying user-specified updates"
         UPDATES_DESCRIPTOR_ARGS=()

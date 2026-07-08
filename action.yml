@@ -142,12 +142,10 @@ runs:
     - name: Validate descriptor
       if: ${{ inputs.validate == 'true' }}
       run: |
+        echo "::group::Validating the descriptor"
         pip install boutiques
         bosh validate ${{ github.workspace }}/${{ inputs.output-path }}
-        if [[ $? -ne 0 ]]; then
-          echo "::error::Descriptor is invalid :("
-          exit 1
-        fi
+        echo "::endgroup::"
       shell: bash
 
     - name: Sanitize branch name

@@ -42,7 +42,7 @@ jobs:
         run: |
           pip install -U pip
           pip install .
-      - uses: michellewang/python-cli-to-boutiques@v1
+      - uses: styx-api/python-cli-to-boutiques@v1
         with:
           parser-type: argparse
           parser-location: my_tool.cli:get_parser
@@ -58,7 +58,7 @@ The update keys should be dot/bracket paths.
 This can be used for example to add a `"container-image"` field:
 
 ```yaml
-      - uses: michellewang/python-cli-to-boutiques@v1
+      - uses: styx-api/python-cli-to-boutiques@v1
         with:
           parser-type: argparse
           parser-location: my_tool.cli:get_parser
@@ -73,7 +73,7 @@ This can be used for example to add a `"container-image"` field:
 ### `click` CLI
 
 ```yaml
-      - uses: michellewang/python-cli-to-boutiques@v1
+      - uses: styx-api/python-cli-to-boutiques@v1
         with:
           parser-type: click
           parser-location: my_tool.cli:cli

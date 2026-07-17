@@ -15,7 +15,7 @@ validation = [
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["scripts"]
+pythonpath = ["scripts", "tests"]
 
 [dependency-groups]
 dev = [

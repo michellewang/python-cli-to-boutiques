@@ -17,36 +17,6 @@ wheels = [
 ]
 
 [[package]]
-name = "argparse-to-boutiques"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "argdump" },
-]
-
-[package.optional-dependencies]
-validation = [
-    { name = "boutiques" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
-    { name = "pytest", version = "9.0.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "argdump", specifier = ">=0.1.2" },
-    { name = "boutiques", marker = "extra == 'validation'", specifier = ">=0.5.33" },
-]
-provides-extras = ["validation"]
-
-[package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=8.4.2" }]
-validation = []
-
-[[package]]
 name = "attrs"
 version = "26.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -239,6 +209,35 @@ sdist = { url = "https://files.pythonhosted.org/packages/7d/0d/549bd94f1a0a402dc
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d4/24/a372aaf5c9b7208e7112038812994107bc65a84cd00e0354a88c2c77a617/pytest-9.0.3-py3-none-any.whl", hash = "sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9", size = 375249, upload-time = "2026-04-07T17:16:16.13Z" },
 ]
+
+[[package]]
+name = "python-cli-to-boutiques"
+version = "1.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "argdump" },
+]
+
+[package.optional-dependencies]
+validation = [
+    { name = "boutiques" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "pytest", version = "9.0.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "argdump", specifier = ">=0.1.2" },
+    { name = "boutiques", marker = "extra == 'validation'", specifier = ">=0.5.33" },
+]
+provides-extras = ["validation"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=8.4.2" }]
 
 [[package]]
 name = "referencing"

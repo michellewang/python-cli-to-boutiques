@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "argdump>=0.1.2",
+    "clickdump>=0.1.0",
 ]
 
 [project.optional-dependencies]

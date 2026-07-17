@@ -70,63 +70,15 @@ runs:
 
         pip install -U pip
 
-        echo "::endgroup::"
-
-        echo "::group::Creating the dump file"
         if [[ "$PARSER_TYPE" == "click" ]]; then
-
-          # install clickdump
           pip install clickdump
-
-          # create dump from click command
-          CLICK_ARGS=(--output "$DUMP_FILE")
-          if [[ -n "$CLICK_PROG_NAME" ]]; then
-            CLICK_ARGS+=(--prog "$CLICK_PROG_NAME")
-          fi
-          if [[ -n "$CLICK_PARENT_LOCATION" ]]; then
-            CLICK_ARGS+=(--parent "$CLICK_PARENT_LOCATION")
-          fi
-          python ./scripts/run_clickdump.py "${CLICK_ARGS[@]}" $PARSER_LOCATION
         else
-
-          # install argdump
           pip install argdump
-
-          # create dump from argparse
-          python ./scripts/run_argdump.py --output $DUMP_FILE $PARSER_LOCATION
         fi
-        cat $DUMP_FILE
+
         echo "::endgroup::"
 
-        echo "::group::Creating Boutiques descriptor from dump file"
-        npx -y --package @styx-api/cli styx build $DUMP_FILE --out styx-out --backend boutiques
-        echo "::endgroup::"
-
-        echo "::group::Moving descriptor to output path"
-        # move descriptor to output path
-        mkdir -p $(dirname $OUTPUT_PATH)
-        mv ./styx-out/boutiques/descriptor.json $OUTPUT_PATH
-        echo "::endgroup::"
-
-        echo "::group::Applying user-specified updates"
-        UPDATES_DESCRIPTOR_ARGS=()
-        if [[ "${EXCLUDE_VERSION}" == "true" ]]; then
-          UPDATES_DESCRIPTOR_ARGS+=(--remove-version)
-        fi
-        if [[ -n "${UPDATES_FILE}" ]]; then
-          UPDATES_DESCRIPTOR_ARGS+=(--updates-file ${{ github.workspace }}/${UPDATES_FILE})
-        fi
-        if [[ -n "${UPDATES_STR}" ]]; then
-          UPDATES_DESCRIPTOR_ARGS+=(--updates-str "${UPDATES_STR}")
-        fi
-        if [[ "${#UPDATES_DESCRIPTOR_ARGS[@]}" -gt 0 ]]; then
-          python ./scripts/update_descriptor.py --descriptor $OUTPUT_PATH "${UPDATES_DESCRIPTOR_ARGS[@]}"
-        fi
-        echo "::endgroup::"
-
-        echo "::group::Final descriptor"
-        cat $OUTPUT_PATH
-        echo "::endgroup::"
+        bash ./scripts/create_descriptor.sh
       env:
         PARSER_TYPE: ${{ inputs.parser-type }}
         PARSER_LOCATION: ${{ inputs.parser-location }}
@@ -135,7 +87,7 @@ runs:
         CLICK_PROG_NAME: ${{ inputs.click-prog-name }}
         CLICK_PARENT_LOCATION: ${{ inputs.click-parent-location }}
         EXCLUDE_VERSION: ${{ inputs.exclude-version }}
-        UPDATES_FILE: ${{ inputs.updates-file }}
+        UPDATES_FILE: ${{ inputs.updates-file && format('{0}/{1}', github.workspace, inputs.updates-file) || '' }}
         UPDATES_STR: ${{ inputs.updates-str }}
       shell: bash
 
@@ -155,7 +107,7 @@ runs:
         SANITIZED="${{ inputs.parser-location }}"
         SANITIZED="${SANITIZED//./__}"
         SANITIZED="${SANITIZED//:/-}"
-        echo "branch=argparse-to-boutiques/${SANITIZED}" >> "$GITHUB_OUTPUT"
+        echo "branch=python-cli-to-boutiques/${SANITIZED}" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Open pull request

@@ -13,6 +13,9 @@ validation = [
     "boutiques>=0.5.33",
 ]
 
+[tool.pytest.ini_options]
+pythonpath = ["scripts"]
+
 [dependency-groups]
 dev = [
     "pytest>=8.4.2",

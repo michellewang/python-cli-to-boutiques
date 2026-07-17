@@ -1,7 +1,5 @@
 import argparse
 import json
-import sys
-import types
 from pathlib import Path
 
 import pytest
@@ -14,15 +12,8 @@ def parser():
     return argparse.ArgumentParser()
 
 
-def _make_fake_module(name: str, attr_name: str, attr):
-    mod = types.ModuleType(name)
-    setattr(mod, attr_name, attr)
-    sys.modules[name] = mod
-    return mod
-
-
 class TestLoadParser:
-    def test_returns_argument_parser(self, parser):
+    def test_returns_argument_parser(self, parser, _make_fake_module):
         _make_fake_module("fake_ok", "make_parser", lambda: parser)
         result = load_parser("fake_ok", "make_parser")
         assert result is parser
@@ -31,12 +22,12 @@ class TestLoadParser:
         with pytest.raises(ModuleNotFoundError):
             load_parser("nonexistent_module_xyz", "func")
 
-    def test_missing_attribute_raises(self):
+    def test_missing_attribute_raises(self, _make_fake_module):
         _make_fake_module("fake_no_attr", "other_func", lambda: None)
         with pytest.raises(AttributeError, match="has no attribute"):
             load_parser("fake_no_attr", "missing_func")
 
-    def test_wrong_return_type_raises(self):
+    def test_wrong_return_type_raises(self, _make_fake_module):
         _make_fake_module("fake_bad_ret", "not_a_parser", lambda: "not a parser")
         with pytest.raises(
             TypeError, match="did not return an argparse.ArgumentParser"
@@ -45,7 +36,7 @@ class TestLoadParser:
 
 
 class TestRunArgdump:
-    def test_writes_valid_json(self, parser, tmp_path):
+    def test_writes_valid_json(self, parser, _make_fake_module, tmp_path):
         parser.add_argument("--foo")
         _make_fake_module("dump_mod", "make_parser", lambda: parser)
         out = tmp_path / "out.json"
@@ -53,13 +44,13 @@ class TestRunArgdump:
         data = json.loads(out.read_text())
         assert "actions" in data
 
-    def test_creates_parent_directories(self, parser, tmp_path):
+    def test_creates_parent_directories(self, parser, _make_fake_module, tmp_path):
         _make_fake_module("dump_mod2", "make_parser", lambda: parser)
         out = tmp_path / "nested" / "deep" / "out.json"
         run_argdump("dump_mod2:make_parser", out)
         assert out.exists()
 
-    def test_custom_indent(self, parser, tmp_path):
+    def test_custom_indent(self, parser, _make_fake_module, tmp_path):
         _make_fake_module("dump_mod3", "make_parser", lambda: parser)
         out = tmp_path / "out.json"
         run_argdump("dump_mod3:make_parser", out, indent=4)

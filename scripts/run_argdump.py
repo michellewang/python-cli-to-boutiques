@@ -4,6 +4,7 @@
 import argparse
 import importlib
 from pathlib import Path
+from typing import Optional
 
 import argdump
 
@@ -29,7 +30,9 @@ def load_parser(module_path: str, parser_func_name: str) -> argparse.ArgumentPar
     return parser
 
 
-def run_argdump(location: str, output_path: Path, indent=DEFAULT_INDENT):
+def run_argdump(
+    location: str, output_path: Path, indent=DEFAULT_INDENT, prog: Optional[str] = None
+):
     """Serialize an `argparse.ArgumentParser` to JSON using argdump."""
     module_path, parser_name = location.split(":")
     parser_to_serialize = load_parser(module_path, parser_name)

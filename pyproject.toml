@@ -21,4 +21,7 @@ pythonpath = ["scripts", "tests"]
 test = [
     "pytest>=8.4.2",
 ]
-dev = ["pre-commit", {include-group = "test"}]
+dev = [
+    "pre-commit>=4.3.0",
+    {include-group = "test"},
+]

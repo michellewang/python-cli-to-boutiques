@@ -15,9 +15,9 @@ def _base_env(tmp_path: Path) -> dict[str, str]:
     env["PYTHONPATH"] = str(REPO_ROOT / "tests")
     env["PARSER_TYPE"] = "argparse"
     env["PARSER_LOCATION"] = "conftest:make_parser"
+    env["PROG_NAME"] = ""
     env["DUMP_FILE"] = "dump.json"
     env["OUTPUT_PATH"] = str(tmp_path / "desc.json")
-    env["CLICK_PROG_NAME"] = ""
     env["CLICK_PARENT_LOCATION"] = ""
     env["EXCLUDE_VERSION"] = "false"
     env["UPDATES_FILE"] = ""
@@ -90,7 +90,7 @@ class TestClickFlow:
             {
                 "PARSER_TYPE": "click",
                 "PARSER_LOCATION": "conftest:test_cli",
-                "CLICK_PROG_NAME": "myprog",
+                "PROG_NAME": "myprog",
             },
         )
         assert result.returncode == 0

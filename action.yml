@@ -21,10 +21,6 @@ inputs:
   token:
     description: GitHub token with write permissions for "contents" and "pull-requests". Required if open-pr is true.
     required: false
-  click-prog-name:
-    description: Program name to use for the Click parser type. By default this will be the name of the decorated function.
-    deprecationMessage: This input is deprecated and will be removed in a future release. Use the "prog-name" input instead.
-    required: false
   click-parent-location:
     description: Module path to and name of function that produces the click.Group object that contains the click.Command object to serialize. E.g., "my_package.my_module:my_func_name". This is needed for nested commands.
     required: false
@@ -42,6 +38,11 @@ inputs:
     description: Whether to validate the generated Boutiques descriptor. If this is set to true, the action will fail if the descriptor is invalid.
     required: false
     default: false
+  # TODO deprecate in v2
+  click-prog-name:
+    description: Program name to use for the Click parser type. By default this will be the name of the decorated function.
+    deprecationMessage: This input is deprecated and will be removed in a future release. Use the "prog-name" input instead.
+    required: false
 
 runs:
   using: composite

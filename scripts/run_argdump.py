@@ -4,6 +4,7 @@
 import argparse
 import importlib
 from pathlib import Path
+from typing import Optional
 
 import argdump
 
@@ -29,11 +30,13 @@ def load_parser(module_path: str, parser_func_name: str) -> argparse.ArgumentPar
     return parser
 
 
-def run_argdump(location: str, output_path: Path, indent=DEFAULT_INDENT):
+def run_argdump(
+    location: str, output_path: Path, indent=DEFAULT_INDENT, prog: Optional[str] = None
+):
     """Serialize an `argparse.ArgumentParser` to JSON using argdump."""
     module_path, parser_name = location.split(":")
     parser_to_serialize = load_parser(module_path, parser_name)
-    serialized_parser = argdump.dumps(parser_to_serialize, indent=indent)
+    serialized_parser = argdump.dumps(parser_to_serialize, indent=indent, prog=prog)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(f"{serialized_parser}\n")
 
@@ -58,13 +61,18 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_INDENT,
         help="JSON indentation. Default: %(default)s",
     )
+    parser.add_argument(
+        "--prog",
+        default=None,
+        help="Override the program name.",
+    )
     return parser
 
 
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    run_argdump(args.location, args.output_path, indent=args.indent)
+    run_argdump(args.location, args.output_path, indent=args.indent, prog=args.prog)
 
 
 if __name__ == "__main__":

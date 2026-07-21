@@ -15,9 +15,9 @@ def _base_env(tmp_path: Path) -> dict[str, str]:
     env["PYTHONPATH"] = str(REPO_ROOT / "tests")
     env["PARSER_TYPE"] = "argparse"
     env["PARSER_LOCATION"] = "conftest:make_parser"
+    env["PROG_NAME"] = ""
     env["DUMP_FILE"] = "dump.json"
     env["OUTPUT_PATH"] = str(tmp_path / "desc.json")
-    env["CLICK_PROG_NAME"] = ""
     env["CLICK_PARENT_LOCATION"] = ""
     env["EXCLUDE_VERSION"] = "false"
     env["UPDATES_FILE"] = ""
@@ -56,6 +56,19 @@ class TestArgparseFlow:
         result = _run(tmp_path)
         assert "run_clickdump" not in result.stderr
 
+    def test_custom_args(self, tmp_path):
+        result = _run(
+            tmp_path,
+            {
+                "PROG_NAME": "custom_name",
+            },
+        )
+        assert result.returncode == 0
+        out_file = tmp_path / "desc.json"
+        assert out_file.exists()
+        data = json.loads(out_file.read_text())
+        assert data["name"] == "custom_name"
+
 
 class TestClickFlow:
     def test_creates_output_file(self, tmp_path):
@@ -77,7 +90,7 @@ class TestClickFlow:
             {
                 "PARSER_TYPE": "click",
                 "PARSER_LOCATION": "conftest:test_cli",
-                "CLICK_PROG_NAME": "myprog",
+                "PROG_NAME": "myprog",
             },
         )
         assert result.returncode == 0

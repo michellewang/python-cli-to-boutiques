@@ -8,6 +8,9 @@ inputs:
   parser-location:
     description: Module path to and name of function that produces the argparse.ArgumentParser or click.Command objects. E.g., "my_package.my_module:my_func_name"
     required: true
+  prog-name:
+    description: Program name to use. Highly recommended if the name is not explicitly set in the parser source code.
+    required: false
   output-path:
     description: Where the output Boutiques description file should be written
     required: true
@@ -17,9 +20,6 @@ inputs:
     default: true
   token:
     description: GitHub token with write permissions for "contents" and "pull-requests". Required if open-pr is true.
-    required: false
-  click-prog-name:
-    description: Program name to use for the Click parser type. By default this will be the name of the decorated function.
     required: false
   click-parent-location:
     description: Module path to and name of function that produces the click.Group object that contains the click.Command object to serialize. E.g., "my_package.my_module:my_func_name". This is needed for nested commands.
@@ -38,6 +38,11 @@ inputs:
     description: Whether to validate the generated Boutiques descriptor. If this is set to true, the action will fail if the descriptor is invalid.
     required: false
     default: false
+  # TODO deprecate in v2
+  click-prog-name:
+    description: Program name to use for the Click parser type. By default this will be the name of the decorated function.
+    deprecationMessage: This input is deprecated and will be removed in a future release. Use the "prog-name" input instead.
+    required: false
 
 runs:
   using: composite
@@ -52,6 +57,9 @@ runs:
         if [[ "${{ inputs.open-pr }}" == "true" && -z "${{ inputs.token }}" ]]; then
           echo "::error::token must be provided if open-pr is true"
           exit 2
+        fi
+        if [[ ! -z "${{ inputs.click-prog-name }}" && ! -z "${{ inputs.prog-name }}" ]]; then
+          echo "::warning::Both click-prog-name and prog-name were provided: using prog-name."
         fi
       shell: bash
 
@@ -82,9 +90,9 @@ runs:
       env:
         PARSER_TYPE: ${{ inputs.parser-type }}
         PARSER_LOCATION: ${{ inputs.parser-location }}
+        PROG_NAME: ${{ inputs.prog-name || inputs.click-prog-name }}
         OUTPUT_PATH: ${{ github.workspace }}/${{ inputs.output-path }}
         DUMP_FILE: dump.json
-        CLICK_PROG_NAME: ${{ inputs.click-prog-name }}
         CLICK_PARENT_LOCATION: ${{ inputs.click-parent-location }}
         EXCLUDE_VERSION: ${{ inputs.exclude-version }}
         UPDATES_FILE: ${{ inputs.updates-file && format('{0}/{1}', github.workspace, inputs.updates-file) || '' }}

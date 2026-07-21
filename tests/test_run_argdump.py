@@ -57,6 +57,14 @@ class TestRunArgdump:
         text = out.read_text()
         assert "    " in text
 
+    @pytest.mark.parametrize("prog", ["custom_name1", "custom_name2"])
+    def test_with_prog_override(self, parser, _make_fake_module, tmp_path, prog):
+        _make_fake_module("dump_mod4", "make_parser", lambda: parser)
+        out = tmp_path / "out.json"
+        run_argdump("dump_mod4:make_parser", out, prog=prog)
+        data = json.loads(out.read_text())
+        assert data["prog"] == prog
+
 
 class TestBuildParser:
     def test_returns_argument_parser(self):
@@ -68,9 +76,21 @@ class TestBuildParser:
         args = parser.parse_args(["mymod:myfunc"])
         assert args.output_path == Path("argdump.json")
         assert args.indent == 2
+        assert args.prog is None
 
-    def test_custom_output_and_indent(self):
+    def test_custom_args(self):
         parser = build_parser()
-        args = parser.parse_args(["mymod:myfunc", "-o", "custom.json", "--indent", "4"])
+        args = parser.parse_args(
+            [
+                "mymod:myfunc",
+                "-o",
+                "custom.json",
+                "--indent",
+                "4",
+                "--prog",
+                "custom_name",
+            ]
+        )
         assert args.output_path == Path("custom.json")
         assert args.indent == 4
+        assert args.prog == "custom_name"

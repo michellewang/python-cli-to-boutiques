@@ -8,10 +8,10 @@ GitHub Action to create a [Boutiques descriptor](https://boutiques.github.io/) f
 |------|-------------|----------|---------|
 | `parser-type` | Type of parser to serialize. Either `"argparse"` or `"click"`. | yes | `argparse` |
 | `parser-location` | Module path to and name of function that produces the `argparse.ArgumentParser` or `click.Command` object. E.g., `"my_package.my_module:my_func_name"`. | yes | — |
+| `prog-name` | Program name to use. **Highly recommended** if the name is not explicitly set in the parser source code. | no | — |
 | `output-path` | Where the output Boutiques description file should be written. | yes | — |
 | `open-pr` | Whether to open a pull request with the generated descriptor. A GitHub token must be provided as well. | no | `true` |
 | `token` | GitHub token with write permissions for `contents` and `pull-requests`. Required if `open-pr` is true. | no | — |
-| `click-prog-name` | Program name to use for the Click parser type. By default this will be the name of the decorated function. | no | — |
 | `click-parent-location` | Module path to and name of function that produces the `click.Group` object that contains the `click.Command` object to serialize. E.g., `"my_package.my_module:my_func_name"`. Needed for nested commands. | no | — |
 | `exclude-version` | Whether to exclude the `tool-version` field in the Boutiques descriptor even if version information is available. Enabled by default because dynamic versioning schemes can cause the descriptor to be updated on every commit. | no | `true` |
 | `updates-file` | Path to a JSON file with updates to apply to the generated Boutiques descriptor. The file should contain a map of dot/bracket paths to values (e.g. `{"description": "new desc"}`). | no | — |
@@ -46,6 +46,7 @@ jobs:
         with:
           parser-type: argparse
           parser-location: my_tool.cli:get_parser
+          prog-name: my_tool
           output-path: descriptor.json
           token: ${{ secrets.TOKEN }}
 ```
@@ -62,6 +63,7 @@ This can be used for example to add a `"container-image"` field:
         with:
           parser-type: argparse
           parser-location: my_tool.cli:get_parser
+          prog-name: my_tool
           output-path: descriptor.json
           token: ${{ secrets.TOKEN }}
           updates-str: '{"container-image.image": "my-container-image:tag", "container-image.type": "docker"}'
@@ -77,7 +79,7 @@ This can be used for example to add a `"container-image"` field:
         with:
           parser-type: click
           parser-location: my_tool.cli:cli
+          prog-name: my-tool
           output-path: descriptor.json
           token: ${{ secrets.TOKEN }}
-          click-prog-name: my-tool
 ```

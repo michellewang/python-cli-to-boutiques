@@ -4,15 +4,19 @@ set -euo pipefail
 # -- Create dump file --
 if [[ "$PARSER_TYPE" == "click" ]]; then
   CLICK_ARGS=(--output "$DUMP_FILE")
-  if [[ -n "$CLICK_PROG_NAME" ]]; then
-    CLICK_ARGS+=(--prog "$CLICK_PROG_NAME")
+  if [[ -n "$PROG_NAME" ]]; then
+    CLICK_ARGS+=(--prog "$PROG_NAME")
   fi
   if [[ -n "$CLICK_PARENT_LOCATION" ]]; then
     CLICK_ARGS+=(--parent "$CLICK_PARENT_LOCATION")
   fi
   python ./scripts/run_clickdump.py "${CLICK_ARGS[@]}" "$PARSER_LOCATION"
 elif [[ "$PARSER_TYPE" == "argparse" ]]; then
-  python ./scripts/run_argdump.py --output "$DUMP_FILE" "$PARSER_LOCATION"
+  ARGPARSE_ARGS=(--output "$DUMP_FILE")
+  if [[ -n "$PROG_NAME" ]]; then
+    ARGPARSE_ARGS+=(--prog "$PROG_NAME")
+  fi
+  python ./scripts/run_argdump.py "${ARGPARSE_ARGS[@]}" "$PARSER_LOCATION"
 else
   echo "Error: PARSER_TYPE must be 'argparse' or 'click', got '$PARSER_TYPE'" >&2
   exit 1
